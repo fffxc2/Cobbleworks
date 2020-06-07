@@ -1,41 +1,42 @@
 package fffxc2.cobbleworks;
 
 import com.google.gson.*;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.JsonUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 import java.lang.reflect.Type;
-
-import static fffxc2.cobbleworks.Util.getBlockForResorceName;
+import static fffxc2.cobbleworks.Util.*;
 
 public class SpawnDefinitionEntry implements Comparable<SpawnDefinitionEntry> {
-    private final IBlockState replacementBlock;
-    private final int distance;
-    private final boolean allDistances;
+    private final BlockState replacementBlock;
+    private final int level;
+    private final boolean allLevels;
     private final float chance;
     private final int priority;
 
-    public SpawnDefinitionEntry(IBlockState replacementBlock, int distance, float chance, int priority) {
+    public SpawnDefinitionEntry(BlockState replacementBlock, int level, float chance, int priority) {
         this.replacementBlock = replacementBlock;
-        this.distance = distance;
-        this.allDistances = false;
+        this.level = level;
+        this.allLevels = false;
         this.chance = chance;
         this.priority = priority;
     }
 
-    public SpawnDefinitionEntry(IBlockState replacementBlock, float chance, int priority) {
+    public SpawnDefinitionEntry(BlockState replacementBlock, float chance, int priority) {
         this.replacementBlock = replacementBlock;
-        this.distance = 0;
-        this.allDistances = true;
+        this.level = 0;
+        this.allLevels = true;
         this.chance = chance;
         this.priority = priority;
     }
 
-    private boolean validDistance(int distance){
-        return this.allDistances || this.distance == distance;
+    private boolean validFluidLevel(int distance){
+        return this.allLevels || this.level == distance;
     }
+
     // Note, SpawnDefinition is responsible for making sure SpawnDefinitionEntrys apply in the right order
-    public IBlockState apply(IBlockState currentBlock, int distance) {
-        if (!validDistance(distance) || this.chance < Math.random()) {
+    public BlockState apply(BlockState currentBlock, int distance) {
+        if (!validFluidLevel(distance) || this.chance < Math.random()) {
             // If it's the wrong position or the chance roll fails make no changes
             return currentBlock;
         } else {
@@ -56,31 +57,32 @@ public class SpawnDefinitionEntry implements Comparable<SpawnDefinitionEntry> {
         @Override
         public SpawnDefinitionEntry deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
             JsonObject root = json.getAsJsonObject();
-            String replacementBlockString = JsonUtils.getString(root, "type");
+
+            String replacementBlockString = getAsString(root, "type");
             if(replacementBlockString.isEmpty()) {
                 throw new JsonParseException("Invalid/Missing 'type' !");
             }
-            IBlockState replacementBlock = getBlockForResorceName(replacementBlockString);
+            BlockState replacementBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(replacementBlockString)).getDefaultState();
 
             float chance = 1.0f;
-            if(JsonUtils.hasField(root, "chance")){
-                chance = JsonUtils.getFloat(root, "chance");
+            if(root.has("chance")){
+                chance = getAsFloat(root, "chance");
             }
 
             int priority = 1;
-            if(JsonUtils.hasField(root, "priority")) {
-                priority = JsonUtils.getInt(root, "priority");
+            if(root.has("priority")) {
+                priority = getAsInt(root, "priority");
             }
 
-            if(!JsonUtils.hasField(root, "distance")) {
-                throw new JsonParseException("Invalid/missing 'distance' !");
+            if(!root.has("level")) {
+                throw new JsonParseException("Invalid/missing 'level' !");
             }
 
-            if(JsonUtils.getString(root, "distance").equals("*")) {
+            if(getAsString(root, "level").equals("*")) {
                 return new SpawnDefinitionEntry(replacementBlock, chance, priority);
             } else {
-                int targetDistance = JsonUtils.getInt(root, "distance");
-                return new SpawnDefinitionEntry(replacementBlock,targetDistance, chance, priority);
+                int targetDistance = getAsInt(root, "level");
+                return new SpawnDefinitionEntry(replacementBlock, targetDistance, chance, priority);
             }
         }
     }

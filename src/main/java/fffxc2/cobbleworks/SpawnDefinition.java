@@ -2,13 +2,13 @@ package fffxc2.cobbleworks;
 
 import com.google.gson.*;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.JsonUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -28,43 +28,44 @@ public class SpawnDefinition {
     public void handleEvent(BlockEvent.FluidPlaceBlockEvent event) {
         System.out.println("Event for: "+event.getOriginalState().getBlock()+", checking reaction with: "+this.reactionBlock);
         if (event.getOriginalState().getBlock() != this.eventBlock) return;
-        BlockPos eventPos = event.getLiquidPos(), reactionPos = null;
-        World world = event.getWorld();
-        for (BlockPos pos : new BlockPos[]{eventPos.east(), eventPos.west(), eventPos.north(), eventPos.south(), eventPos.up(), eventPos.down()}) {
-            if (world.getBlockState(pos).getBlock().equals(this.reactionBlock)) {
-                reactionPos = pos;
+        System.out.println("Matching reaction!");
+        BlockPos eventPos = event.getLiquidPos(), waterSourcePos = null;
+        IWorld world = event.getWorld();
+        for (BlockPos pos : new BlockPos[]{eventPos.east(), eventPos.west(), eventPos.north(), eventPos.south()}) {
+            if (world.getBlockState(pos).getBlock().equals(Blocks.WATER)) {
+                waterSourcePos = pos;
                 break;
             }
         }
-        IBlockState targetBlock = null;
-        if (reactionPos != null) {
-            int reactionPosInt = world.getBlockState(reactionPos).getBlock().getMetaFromState(world.getBlockState(reactionPos));
+
+        if (waterSourcePos != null) {
+            BlockState targetBlock = null;
+
             for ( SpawnDefinitionEntry entry : entries) {
-                targetBlock = entry.apply(targetBlock, reactionPosInt);
+                System.out.println(entry);
+                targetBlock = entry.apply(targetBlock, world.getBlockState(waterSourcePos).getFluidState().getLevel());
             }
             // If unknown, default don't change behavior
             if(targetBlock != null) {
                 event.setNewState(targetBlock);
             }
         }
-
     }
-
+//
     public static class SpawnDefinitionDeserializer implements JsonDeserializer<SpawnDefinition> {
         @Override
         public SpawnDefinition deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
             JsonObject root = json.getAsJsonObject();
 
             String reactionBlockString;
-            if (JsonUtils.hasField(root, "catalyst")) {
-                reactionBlockString = JsonUtils.getString(root, "catalyst");
-            } else {
+//            if (root.has("catalyst")) {
+//                reactionBlockString = getAsString(root, "catalyst");
+//            } else {
                 reactionBlockString = "minecraft:water";
-            }
-            String eventBlockString = "minecraft:flowing_lava";
+//            }
+            String eventBlockString = "minecraft:lava";
 
-
-            JsonArray definition = JsonUtils.getJsonArray(root, "definition", new JsonArray());
+            JsonArray definition = root.getAsJsonArray("definition");
             if(definition.size() == 0) {
                 throw new JsonParseException("Empty/Missing 'definition' !");
             }
