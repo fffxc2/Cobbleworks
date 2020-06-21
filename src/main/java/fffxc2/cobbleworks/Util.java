@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 public class Util {
     // Consider doing this via Block.getStateFromMeta
     //Eg: <modid>:<blockname>@<meta>
-    // Downside, less human readable, upside how the f do you find block property names/values otherwise? (maybe add a command?)
+    // Downside, less human readable, upside code is less messy
     public static IBlockState getBlockForResorceName(String resourceName) {
         try {
             String[] split = resourceName.split("\\[");
@@ -24,8 +24,7 @@ public class Util {
             return target;
         } catch(Exception e) {
             // If anything goes wrong, just return cobble
-            System.out.println("Exception - Unable to find: "+resourceName);
-            e.printStackTrace();
+            System.out.println("Invalid replacement definition: "+resourceName+", replacing with cobblestone");
             return Blocks.COBBLESTONE.getDefaultState();
         }
     }
@@ -33,7 +32,7 @@ public class Util {
     private static IBlockState updatePropertyValue(IBlockState blockState, String targetPropertyString, String targetValueString) {
         IProperty targetProperty = blockState.getBlock().getBlockState().getProperty(targetPropertyString);
         for (Object value : targetProperty.getAllowedValues()) {
-            if (value.toString().equals(targetValueString)) {
+            if (value.toString().equalsIgnoreCase(targetValueString)) {
                 blockState = blockState.withProperty(targetProperty, blockState.getValue(targetProperty).getClass().cast(value));
             }
         }

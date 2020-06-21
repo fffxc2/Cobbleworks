@@ -2,28 +2,30 @@ package fffxc2.cobbleworks;
 
 import com.google.gson.*;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.JsonUtils;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import static fffxc2.cobbleworks.Util.getBlockForResorceName;
 
 public class SpawnDefinitionEntry implements Comparable<SpawnDefinitionEntry> {
-    private final IBlockState replacementBlock;
+    private final ArrayList<IBlockState> replacenmentBlockArray;
     private final int distance;
     private final boolean allDistances;
     private final float chance;
     private final int priority;
 
-    public SpawnDefinitionEntry(IBlockState replacementBlock, int distance, float chance, int priority) {
-        this.replacementBlock = replacementBlock;
+    public SpawnDefinitionEntry(ArrayList<IBlockState> replacenmentBlockArray, int distance, float chance, int priority) {
+        this.replacenmentBlockArray = replacenmentBlockArray;
         this.distance = distance;
         this.allDistances = false;
         this.chance = chance;
         this.priority = priority;
     }
 
-    public SpawnDefinitionEntry(IBlockState replacementBlock, float chance, int priority) {
-        this.replacementBlock = replacementBlock;
+    public SpawnDefinitionEntry(ArrayList<IBlockState> replacenmentBlockArray, float chance, int priority) {
+        this.replacenmentBlockArray = replacenmentBlockArray;
         this.distance = 0;
         this.allDistances = true;
         this.chance = chance;
@@ -40,7 +42,7 @@ public class SpawnDefinitionEntry implements Comparable<SpawnDefinitionEntry> {
             return currentBlock;
         } else {
             // Otherwise update the block
-            return replacementBlock;
+            return replacenmentBlockArray.get((int)(Math.random()*replacenmentBlockArray.size()));
         }
     }
 
@@ -56,11 +58,24 @@ public class SpawnDefinitionEntry implements Comparable<SpawnDefinitionEntry> {
         @Override
         public SpawnDefinitionEntry deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
             JsonObject root = json.getAsJsonObject();
-            String replacementBlockString = JsonUtils.getString(root, "type");
-            if(replacementBlockString.isEmpty()) {
-                throw new JsonParseException("Invalid/Missing 'type' !");
+            ArrayList<IBlockState> replacenmentBlockArray = new ArrayList<>();
+
+            if (JsonUtils.hasField(root, "types")) {
+                JsonArray blockStrings = JsonUtils.getJsonArray(root, "types");
+                for (JsonElement blockString : blockStrings) {
+                    replacenmentBlockArray.add(getBlockForResorceName(blockString.getAsString()));
+                }
+            } else {
+                String replacementBlockString = JsonUtils.getString(root, "type");
+                if (replacementBlockString.isEmpty()) {
+                    throw new JsonParseException("Invalid/Missing 'type' !");
+                }
+                replacenmentBlockArray.add(getBlockForResorceName(replacementBlockString));
             }
-            IBlockState replacementBlock = getBlockForResorceName(replacementBlockString);
+
+            if (replacenmentBlockArray.size() == 0) {
+                replacenmentBlockArray.add(Blocks.COBBLESTONE.getDefaultState());
+            }
 
             float chance = 1.0f;
             if(JsonUtils.hasField(root, "chance")){
@@ -76,11 +91,12 @@ public class SpawnDefinitionEntry implements Comparable<SpawnDefinitionEntry> {
                 throw new JsonParseException("Invalid/missing 'distance' !");
             }
 
-            if(JsonUtils.getString(root, "distance").equals("*")) {
-                return new SpawnDefinitionEntry(replacementBlock, chance, priority);
+            String distance = JsonUtils.getString(root, "distance");
+            if(distance.equals("*")) {
+                return new SpawnDefinitionEntry(replacenmentBlockArray, chance, priority);
             } else {
-                int targetDistance = JsonUtils.getInt(root, "distance");
-                return new SpawnDefinitionEntry(replacementBlock,targetDistance, chance, priority);
+                int targetDistance = Integer.parseInt(distance);
+                return new SpawnDefinitionEntry(replacenmentBlockArray,targetDistance, chance, priority);
             }
         }
     }

@@ -63,7 +63,6 @@ public class SpawnDefinition {
             }
             String eventBlockString = "minecraft:flowing_lava";
 
-
             JsonArray definition = JsonUtils.getJsonArray(root, "definition", new JsonArray());
             if(definition.size() == 0) {
                 throw new JsonParseException("Empty/Missing 'definition' !");

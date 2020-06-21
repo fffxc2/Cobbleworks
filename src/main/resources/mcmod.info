@@ -3,7 +3,7 @@
   "modid": "cobbleworks",
   "name": "Cobbleworks",
   "description": "A mod to tweak cobblestone generation",
-  "version": "1.0",
+  "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",

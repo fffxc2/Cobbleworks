@@ -1,0 +1,117 @@
+{
+  "definition": [
+    {
+      "types": [
+        "minecraft:iron_ore",
+        "minecraft:iron_ore",
+        "minecraft:iron_ore",
+        "nuclearcraft:ore[type=copper]",
+        "nuclearcraft:ore[type=tin]",
+        "nuclearcraft:ore[type=lead]"
+      ],
+      "distance": "1",
+      "chance": 0.25
+
+    },
+    {
+      "types": [
+        "minecraft:lapis_ore",
+        "minecraft:redstone_ore",
+        "minecraft:redstone_ore",
+        "minecraft:quartz_ore"
+      ],
+      "distance": "2",
+      "chance": 0.25
+    },
+    {
+      "types": [
+        "nuclearcraft:ore[type=thorium]",
+        "nuclearcraft:ore[type=uranium]",
+        "nuclearcraft:ore[type=boron]",
+        "nuclearcraft:ore[type=lithium]",
+        "nuclearcraft:ore[type=magnesium]"
+      ],
+      "distance": "3",
+      "chance": 0.25
+    },
+    {
+      "types": [
+        "minecraft:gold_ore",
+        "thermalfoundation:ore[type=SILVER]",
+        "thermalfoundation:ore[type=NICKEL]",
+        "thermalfoundation:ore[type=ALUMINUM]",
+        "mekanism:oreblock[type=OSMIUM]"
+      ],
+      "distance": "4",
+      "chance": 0.25
+    },
+    {
+      "types": [
+        "thermalfoundation:ore[type=PLATINUM]",
+        "thermalfoundation:ore[type=IRIDIUM]",
+        "thermalfoundation:ore[type=MITHRIL]",
+        "tconstruct:ore[type=COBALT]",
+        "tconstruct:ore[type=ARDITE]"
+      ],
+      "distance": "5",
+      "chance": 0.25
+    },
+    {
+      "types": [
+        "appliedenergistics2:quartz_ore",
+        "appliedenergistics2:charged_quartz_ore",
+        "rftools:dimensional_shard_ore",
+        "astralsorcery:blockcustomore"
+
+      ],
+      "distance": "6",
+      "chance": 0.25
+    },
+    {
+      "types": [
+        "minecraft:diamond_ore",
+        "minecraft:emerald_ore",
+        "draconicevolution:draconium_ore"
+      ],
+      "distance": "*",
+      "chance": 0.05,
+      "priority": 2
+    },
+    {
+      "types": [
+        "minecraft:iron_ore",
+        "minecraft:gold_ore",
+        "minecraft:coal_ore",
+        "minecraft:lapis_ore",
+        "minecraft:diamond_ore",
+        "minecraft:redstone_ore",
+        "minecraft:emerald_ore",
+        "minecraft:quartz_ore",
+        "nuclearcraft:ore[type=copper]",
+        "nuclearcraft:ore[type=tin]",
+        "nuclearcraft:ore[type=lead]",
+        "nuclearcraft:ore[type=thorium]",
+        "nuclearcraft:ore[type=uranium]",
+        "nuclearcraft:ore[type=boron]",
+        "nuclearcraft:ore[type=lithium]",
+        "nuclearcraft:ore[type=magnesium]",
+        "thermalfoundation:ore[type=SILVER]",
+        "thermalfoundation:ore[type=ALUMINUM]",
+        "thermalfoundation:ore[type=NICKEL]",
+        "thermalfoundation:ore[type=PLATINUM]",
+        "thermalfoundation:ore[type=IRIDIUM]",
+        "thermalfoundation:ore[type=MITHRIL]",
+        "appliedenergistics2:quartz_ore",
+        "appliedenergistics2:charged_quartz_ore",
+        "draconicevolution:draconium_ore",
+        "mekanism:oreblock[type=OSMIUM]",
+        "rftools:dimensional_shard_ore",
+        "tconstruct:ore[type=COBALT]",
+        "tconstruct:ore[type=ARDITE]"
+      ],
+      "distance": "*",
+      "chance": 0.05
+    }
+  ]
+}
+
